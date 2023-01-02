@@ -1,5 +1,4 @@
 #start
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -7,6 +6,7 @@ import numpy as np
 import cv2
 import uuid
 import os
+from io import BufferedReader, BytesIO
 
 from model import U2NET
 from torch.autograd import Variable
@@ -34,8 +34,12 @@ def save_output(image_name, output_name, pred, d_dir, type):
         mask = np.expand_dims(mask, axis=2)
         imo = np.concatenate((image, mask), axis=2)
         imo = Image.fromarray(imo, 'RGBA')
+        path=d_dir+output_name
+        imo.save(path)
+        return path
+    else:
+        imo.save(d_dir+output_name)
 
-    imo.save(d_dir+output_name)
 # Remove Background From Image (Generate Mask, and Final Results)
 
 
@@ -88,11 +92,11 @@ def removeBg(imagePath):
     dn = (pred-mi)/(ma-mi)
     pred = dn
 
-    save_output(inputs_dir+unique_filename+'.jpg', unique_filename +
+    file = save_output(inputs_dir+unique_filename+'.jpg', unique_filename +
                 '.png', pred, results_dir, 'image')
     save_output(inputs_dir+unique_filename+'.jpg', unique_filename +
                 '.png', pred, masks_dir, 'mask')
-    return "---Success---"
+    return file
 
 
 # ------- Load Trained Model --------
@@ -109,9 +113,13 @@ else:
 # ------- Load Trained Model --------
 
 
-print("---Removing Background...")
+# print("---Removing Background...")
 # ------- Call The removeBg Function --------
-imgPath = "c.jpg"  # Change this to your image path
-print(removeBg(imgPath))
+# imgPath = "c.png"  # Change this to your image path
+# print(removeBg(imgPath))
+
+def Removebg(imgPath):
+    img = removeBg(imgPath)
+    return img
 
 #end
