@@ -3,7 +3,7 @@ from fastapi.responses import StreamingResponse
 # import uvicorn
 from PIL import Image
 import io
-from app import Removebg
+from remove import Removebg
 
 app = FastAPI()
 
