@@ -1,19 +1,24 @@
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse
+import uuid
 
 app = FastAPI()
 
-@app.get("/plot")
-def plot_iris():
+db = []
 
-    import pandas as pd
-    import matplotlib.pyplot as plt
+@app.post("/images/")
+async def create_upload_file(file: UploadFile = File(...)):
 
-    url ='https://gist.githubusercontent.com/curran/a08a1080b88344b0c8a7/raw/0e7a9b0a5d22642a06d3d5b9bcbad9890c8ee534/iris.csv'
-    iris = pd.read_csv(url)
+    contents = await file.read() 
 
-    plt.scatter(iris['sepal_length'], iris['sepal_width'])
-    plt.savefig('iris.png')
-    file = open('iris.png', mode="rb")
+    db.append(file)
 
-    return StreamingResponse(file, media_type="image/png")
+    with open(file.filename, "wb") as f:
+        f.write(contents)
+
+    return {"filename": file.filename}
+
+@app.get("/images/")
+async def show_image():  
+     return db[0]
