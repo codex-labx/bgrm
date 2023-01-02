@@ -1,24 +1,33 @@
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import Response
+import os
+from random import randint
 import uuid
 
 app = FastAPI()
 
 db = []
 
+
 @app.post("/images/")
 async def create_upload_file(file: UploadFile = File(...)):
 
-    contents = await file.read() 
+    file.filename = f"{uuid.uuid4()}.jpg"
+    contents = await file.read()  # <-- Important!
 
-    db.append(file)
-
-    with open(file.filename, "wb") as f:
-        f.write(contents)
+    db.append(contents)
 
     return {"filename": file.filename}
 
+
 @app.get("/images/")
-async def show_image():  
-     return db[0]
+async def read_random_file():
+
+    # get a random file from the image db
+    random_index = randint(0, len(db) - 1)
+
+    # return a response object directly as FileResponse expects a file-like object
+    # and StreamingResponse expects an iterator/generator
+    response = Response(content=db[random_index])
+
+    return response
