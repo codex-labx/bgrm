@@ -12,7 +12,7 @@ def save_image(image):
         f.write(image)
 
 @app.get('/')
-def remove():
+def index():
     return 'RemoveBG Powered by Zandora, Kindly visit /removebg to remove background of images.'
 
 @app.post('/removebg')
